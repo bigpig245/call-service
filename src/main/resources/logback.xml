@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<configuration scan="true">
+  <property name="LOG_FILE_PATTERN" value="%d{yyyy-MM-dd-HH}.gz" />
+  <property name="LOG_MESSAGE_PATTERN" value="%d [%t] %p %c{1} - %m - %X{executionId}/%X{dispatcher}/%X{agency}%n" />
+  <property name="MAX_HISTORY" value="1" />
+  <property name="LOG_BASEDIR" value="${logs.directory:-${catalina.base}}/logs"/>
+
+  <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${LOG_MESSAGE_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="fileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_BASEDIR}/main.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_BASEDIR}/main.${LOG_FILE_PATTERN}</fileNamePattern>
+      <maxHistory>${MAX_HISTORY}</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${LOG_MESSAGE_PATTERN}</pattern>
+    </encoder>
+  </appender>
+  <logger name="com.example.demo" level="debug"/>
+  <root level="error">
+    <appender-ref ref="consoleAppender"/>
+    <appender-ref ref="fileAppender"/>
+  </root>
+</configuration>

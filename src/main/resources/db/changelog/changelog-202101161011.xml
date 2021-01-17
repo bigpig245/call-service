@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+  <changeSet id="202101161011" author="trangnt">
+    <comment>Create base tables</comment>
+    <sql>
+      create table agency(
+      id varchar(36) primary key,
+      name varchar(10000) not null,
+      location varchar(1000) not null,
+      created_date timestamp not null,
+      last_modified_date timestamp not null
+      );
+
+      insert into agency(id, name, location, created_date, last_modified_date)
+      values('4f9b99eb-490a-484e-bade-15e3841dfda9', 'Agency 1', 'Ho Chi Minh City', now(), now());
+      insert into agency(id, name, location, created_date, last_modified_date)
+      values('4f9b99eb-490a-484e-bade-15e3841dfd19', 'Agency 2', 'Ha Noi', now(), now());
+
+      create table officer(
+      id varchar(36) primary key,
+      officer_no varchar(12) not null,
+      officer_name varchar(1000),
+      agency_id varchar(36) not null,
+      access_token varchar(64),
+      created_date timestamp not null,
+      last_modified_date timestamp not null,
+
+      constraint uq_officer_officer_no unique (officer_no),
+      constraint uq_officer_access_token unique (access_token),
+      constraint fk_officer_agency foreign key (agency_id) references agency(id)
+      );
+
+      insert into officer(id, officer_no, officer_name, agency_id, access_token, created_date, last_modified_date)
+      values ('9adc5384-fd64-4b17-9534-bb53954e0376', 'OFFICER_001', 'Officer 1',
+      '4f9b99eb-490a-484e-bade-15e3841dfda9', 'ff45edd3-efc1-4934-b158-1c036e3b6c87', now(), now());
+      insert into officer(id, officer_no, officer_name, agency_id, access_token, created_date, last_modified_date)
+      values ('4c43bfdc-e110-49ff-a44d-22a1b57d8ee9', 'OFFICER_002', 'Officer 2',
+      '4f9b99eb-490a-484e-bade-15e3841dfda9', '434c207a-8d6d-44c3-8430-7f0d195cbb61', now(), now());
+      insert into officer(id, officer_no, officer_name, agency_id, access_token, created_date, last_modified_date)
+      values ('b2dd0b57-2c8f-42d8-bc0d-7fddf9fb3d3d', 'OFFICER_003', 'Officer 3',
+      '4f9b99eb-490a-484e-bade-15e3841dfd19', '7a0f4df8-0a40-424b-8a15-02d3eeaf0a11', now(), now());
+
+      create table event_request (
+      id varchar(36) primary key,
+      agency_id varchar(36) not null,
+      event_number varchar(7) not null,
+      event_type_code varchar(3) not null,
+      event_time datetime not null,
+      dispatch_time datetime,
+      responder varchar(12),
+      dispatcher varchar(12) not null,
+      created_date timestamp not null,
+      last_modified_date timestamp not null,
+
+      constraint fk_event_request_agency foreign key (agency_id) references agency(id),
+      constraint fk_event_request_officer_responder foreign key (responder) references officer(officer_no),
+      constraint fk_event_request_officer_dispatcher foreign key (dispatcher) references officer(officer_no)
+      );
+
+    </sql>
+    <rollback>
+      drop table if exists agency;
+      drop table if exists officer;
+      drop table if exists officer_agency;
+      drop table if exists call_request;
+    </rollback>
+  </changeSet>
+</databaseChangeLog>
